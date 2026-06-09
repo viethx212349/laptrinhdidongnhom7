@@ -67,9 +67,28 @@ export interface SubmitReportPayload {
 }
 
 // =============================================================================
+// Notification Types
+// =============================================================================
+export type NotificationType =
+  | 'NEW_TASK'            // Được giao task mới
+  | 'DEADLINE_REMINDER'   // Nhắc nhở deadline
+  | 'REVISION_REQUIRED';  // Cần sửa bài nộp (KHÔNG dùng REJECTED)
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  isRead: boolean;
+  createdAt: string;       // ISO date string
+  taskId?: string;         // ID task liên quan (nếu có)
+}
+
+// =============================================================================
 // Navigation Param Types
 // =============================================================================
 export type RootStackParamList = {
   TaskList: undefined;
   TaskDetail: { taskId: string };
+  Notifications: undefined;
 };

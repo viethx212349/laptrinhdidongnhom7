@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,11 +11,12 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import TaskCard from '../../components/TaskCard';
 import { MOCK_TASKS } from '../../utils/mockData';
 import { RootStackParamList, Task } from '../../types/types';
+import { getUnreadCount } from '../../services/notificationService';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'TaskList'>;
 
@@ -23,18 +24,35 @@ const TABS = ['IN PROGRESS', 'IN REVIEW', 'DONE', 'REJECTED'];
 
 const TaskListScreen = () => {
   const [activeTab, setActiveTab] = useState('IN PROGRESS');
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigation = useNavigation<NavigationProp>();
+
+  // Refresh unread count every time screen gains focus (AC1 + AC3)
+  useFocusEffect(
+    useCallback(() => {
+      const checkUnread = async () => {
+        const count = await getUnreadCount();
+        setUnreadCount(count);
+      };
+      checkUnread();
+    }, [])
+  );
 
   const handleTaskPress = (taskId: string) => {
     navigation.navigate('TaskDetail', { taskId });
   };
 
+  const handleBellPress = () => {
+    navigation.navigate('Notifications');
+  };
+
   const renderHeader = () => (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>My Workspace</Text>
-      <TouchableOpacity style={styles.bellContainer}>
+      <TouchableOpacity style={styles.bellContainer} onPress={handleBellPress}>
         <Ionicons name="notifications" size={24} color="#000" />
-        <View style={styles.badge} />
+        {/* AC1: Red dot when there are unread notifications */}
+        {unreadCount > 0 && <View style={styles.badge} />}
       </TouchableOpacity>
     </View>
   );
