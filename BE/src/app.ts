@@ -18,9 +18,10 @@ app.use(express.json());
 // Health check - kiểm tra server + kết nối Supabase
 app.get('/api/health', async (_req, res) => {
   try {
-    const { data, error } = await supabase.from('interns').select('id').limit(1);
-
-    const dbStatus = error ? 'disconnected' : 'connected';
+    // const { data, error } = await supabase.from('interns').select('id').limit(1);
+    
+    // Tạm thời bỏ qua DB cho health check để app không chết
+    const dbStatus = 'disconnected';
 
     res.json({
       success: true,
@@ -40,6 +41,26 @@ app.get('/api/health', async (_req, res) => {
       },
     });
   }
+});
+
+// Mock Auth API (Vì hustrung chưa làm logic kết nối thực tế với bảng interns)
+app.post('/api/auth/verify', (req, res) => {
+  const { intern_code } = req.body;
+  if (!intern_code) {
+    return res.status(400).json({ success: false, message: 'Thiếu mã TTS' });
+  }
+  
+  // Trả về mock data để FE có thể login
+  res.json({
+    success: true,
+    data: {
+      intern_id: 'mock-intern-123',
+      intern_code: intern_code,
+      full_name: 'Nguyễn Văn A (Mock)',
+      position: 'Frontend Developer',
+    },
+    message: 'Đăng nhập giả lập thành công'
+  });
 });
 
 // Notification APIs — /api/me/notifications
