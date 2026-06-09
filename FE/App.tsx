@@ -1,64 +1,51 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import TaskListScreen from './src/screens/Intern/TaskListScreen';
+import { View, ActivityIndicator, StyleSheet, SafeAreaView, Text } from 'react-native';
+import useAuthStore from './src/store/useAuthStore';
+import InternLoginScreen from './src/screens/Auth/InternLoginScreen';
+import WorkspaceScreen from './src/screens/Intern/WorkspaceScreen';
 
 export default function App() {
+  const { intern, loading, saveCurrentIntern, error } = useAuthStore();
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0A74FF" />
+      </SafeAreaView>
+    );
+  }
+
+  if (intern) {
+    return <WorkspaceScreen intern={intern} />;
+  }
+
   return (
     <View style={styles.container}>
-      {/* Main Content Area */}
-      <View style={styles.content}>
-        <TaskListScreen />
-      </View>
-      
-      {/* Mock Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <View style={styles.navItem}>
-          <Ionicons name="grid" size={24} color="#000" />
-          <Text style={styles.activeNavText}>WORKSPACE</Text>
-        </View>
-        <View style={styles.navItem}>
-          <Ionicons name="person" size={24} color="#A0A0A0" />
-          <Text style={styles.navText}>PROFILE</Text>
-        </View>
-      </View>
+      {error ? <Text style={styles.globalError}>{error}</Text> : null}
+      <InternLoginScreen onLoginSuccess={saveCurrentIntern} />
     </View>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FAFAFA',
   },
-  content: {
+  loadingContainer: {
     flex: 1,
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 12,
-    paddingBottom: Platform.OS === 'ios' ? 30 : 16, // Extra padding for iPhone home indicator
-    backgroundColor: '#FAFAFA',
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
-  },
-  navItem: {
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    backgroundColor: '#FAFAFA',
   },
-  activeNavText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#000',
-    marginTop: 6,
-    letterSpacing: 1,
-  },
-  navText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#A0A0A0',
-    marginTop: 6,
-    letterSpacing: 1,
+  globalError: {
+    color: '#D32F2F',
+    textAlign: 'center',
+    marginTop: 12,
+    marginHorizontal: 24,
+    fontSize: 14,
   },
 });

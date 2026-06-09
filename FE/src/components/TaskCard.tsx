@@ -20,7 +20,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       
       <View style={styles.infoRow}>
         <Ionicons name="person" size={12} color="#666" style={styles.icon} />
-        <Text style={styles.infoText}>Mentor: {task.mentor}</Text>
+        <Text style={styles.infoText}>Mentor: {"HusTrung"}</Text>
       </View>
       
       <View style={styles.infoRow}>
@@ -31,6 +31,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   );
 };
 
+
+
+// Đây là phần vẽ màu cho TaskCard, bạn có thể tùy chỉnh theo ý muốn để phù hợp với thiết kế của bạn.
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',

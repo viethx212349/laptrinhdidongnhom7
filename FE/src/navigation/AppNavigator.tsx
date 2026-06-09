@@ -1,1 +1,6 @@
-import React from 'react';\n// TODO: Set up React Navigation Stack/Tabs here\nexport default function AppNavigator() { return null; }\n
+import React from 'react';
+
+// TODO: Set up React Navigation Stack/Tabs here
+export default function AppNavigator() {
+  return null;
+}

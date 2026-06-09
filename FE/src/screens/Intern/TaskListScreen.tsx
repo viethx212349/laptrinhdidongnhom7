@@ -14,15 +14,15 @@ const TABS = ['IN PROGRESS', 'IN REVIEW', 'DONE', 'REJECTED'];
 const TaskListScreen = () => {
   const [activeTab, setActiveTab] = useState('IN PROGRESS');
 
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>My Workspace</Text>
-      <TouchableOpacity style={styles.bellContainer}>
-        <Ionicons name="notifications" size={24} color="#000" />
-        <View style={styles.badge} />
-      </TouchableOpacity>
-    </View>
-  );
+  // const renderHeader = () => (
+  //   <View style={styles.header}>
+  //     <Text style={styles.headerTitle}>My Workspace</Text>
+  //     <TouchableOpacity style={styles.bellContainer}>
+  //       <Ionicons name="notifications" size={24} color="#000" />
+  //       <View style={styles.badge} />
+  //     </TouchableOpacity>
+  //   </View>
+  // );
 
   const renderTabs = () => (
     <View style={styles.tabsContainer}>
@@ -43,7 +43,7 @@ const TaskListScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {renderHeader()}
+        {/* {renderHeader()} */}
         
         {/* Divider line below header */}
         <View style={styles.divider} />
