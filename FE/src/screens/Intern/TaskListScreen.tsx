@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,24 +6,82 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import TaskCard from '../../components/TaskCard';
-import { MOCK_TASKS } from '../../utils/mockData';
 import { RootStackParamList } from '../../types/types';
+import { fetchInternDashboard, InternDashboardTask } from '../../services/apiClient';
+import useAuthStore from '../../store/useAuthStore';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Workspace'>;
 
-const TABS = ['IN PROGRESS', 'IN REVIEW', 'DONE', 'REJECTED'];
+const TABS = ['IN PROGRESS', 'NEEDS REVISION', 'IN REVIEW', 'DONE'];
 
 const TaskListScreen = () => {
   const [activeTab, setActiveTab] = useState('IN PROGRESS');
+  const [tasks, setTasks] = useState<InternDashboardTask[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp>();
+  const { intern } = useAuthStore();
+
+  const loadTasks = async () => {
+    if (!intern) return;
+    try {
+      setLoading(true);
+      const res = await fetchInternDashboard(intern.intern_id);
+      if (res.success && res.data) {
+        setTasks(res.data.tasks);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadTasks();
+    }, [intern])
+  );
 
   const handleTaskPress = (taskId: string) => {
     navigation.navigate('TaskDetail', { taskId });
+  };
+
+  const getFilteredAndSortedTasks = () => {
+    let filtered = tasks;
+
+    // Filter by tab
+    if (activeTab === 'IN PROGRESS') {
+      filtered = tasks.filter(t => t.status === 'ĐANG LÀM' || t.status === 'TRỄ HẠN');
+    } else if (activeTab === 'NEEDS REVISION') {
+      filtered = tasks.filter(t => t.status === 'CẦN SỬA');
+    } else if (activeTab === 'IN REVIEW') {
+      filtered = tasks.filter(t => t.status === 'CHỜ DUYỆT');
+    } else if (activeTab === 'DONE') {
+      filtered = tasks.filter(t => t.status === 'HOÀN THÀNH');
+    }
+
+    // Sort: if DONE or IN REVIEW, sort by newest (descending). 
+    // If IN PROGRESS or NEEDS REVISION, sort by due date ascending (closest deadline first).
+    return filtered.sort((a, b) => {
+      const dateA = a.date ? new Date(a.date).getTime() : 0;
+      const dateB = b.date ? new Date(b.date).getTime() : 0;
+
+      if (activeTab === 'DONE' || activeTab === 'IN REVIEW') {
+        return dateB - dateA; // Newest first
+      } else {
+        // Handle null dates (put them at the end)
+        if (!a.date && !b.date) return 0;
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return dateA - dateB; // Closest deadline first
+      }
+    });
   };
 
   const renderTabs = () => (
@@ -42,30 +100,44 @@ const TaskListScreen = () => {
     </View>
   );
 
+  const displayTasks = getFilteredAndSortedTasks();
+
   return (
     <View style={styles.container}>
       <View style={styles.divider} />
       {renderTabs()}
 
       <View style={styles.listHeader}>
-        <Text style={styles.listHeaderText}>ACTIVE ASSIGNMENTS ({MOCK_TASKS.length})</Text>
+        <Text style={styles.listHeaderText}>{activeTab} ASSIGNMENTS ({displayTasks.length})</Text>
         <TouchableOpacity>
           <Ionicons name="filter" size={20} color="#666" />
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={MOCK_TASKS}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TaskCard
-            task={item}
-            onPress={() => handleTaskPress(item.id)}
-          />
-        )}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#000" style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          data={displayTasks}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <TaskCard
+              task={{
+                id: item.id,
+                title: item.title,
+                status: item.status,
+                due_date: item.date || undefined,
+              }}
+              onPress={() => handleTaskPress(item.id)}
+            />
+          )}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No tasks found for this status.</Text>
+          }
+        />
+      )}
     </View>
   );
 };
@@ -128,6 +200,12 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 24,
     paddingBottom: 20,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#999',
+    marginTop: 40,
+    fontSize: 14,
   },
 });
 
