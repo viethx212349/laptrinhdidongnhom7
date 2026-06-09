@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import supabase from './config/supabase';
+import notificationRoutes from './routes/notification.routes';
 
 dotenv.config();
 
@@ -41,11 +42,15 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
+// Notification APIs — /api/me/notifications
+app.use('/api/me/notifications', notificationRoutes);
+
 // ===================== START SERVER =====================
 
 app.listen(PORT, () => {
   console.log(`🚀 InternFlow Mobile Backend running at http://localhost:${PORT}`);
   console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🔔 Notifications API: http://localhost:${PORT}/api/me/notifications`);
 });
 
 export default app;
