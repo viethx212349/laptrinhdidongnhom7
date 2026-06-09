@@ -1,33 +1,42 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-export interface Task {
-  id: string;
-  title: string;
-  mentor: string;
-  date: string;
-}
+import { Task, TaskStatus } from '../types/types';
+import { getStatusLabel, getStatusColor } from '../services/taskService';
 
 interface TaskCardProps {
   task: Task;
+  onPress?: () => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onPress }) => {
+  const statusColor = getStatusColor(task.status);
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      {/* Status Badge */}
+      <View style={[styles.statusBadge, { backgroundColor: statusColor.bg }]}>
+        <Text style={[styles.statusText, { color: statusColor.text }]}>
+          {getStatusLabel(task.status)}
+        </Text>
+      </View>
+
       <Text style={styles.title}>{task.title}</Text>
-      
+
       <View style={styles.infoRow}>
         <Ionicons name="person" size={12} color="#666" style={styles.icon} />
         <Text style={styles.infoText}>Mentor: {task.mentor}</Text>
       </View>
-      
+
       <View style={styles.infoRow}>
         <Ionicons name="time" size={12} color="#666" style={styles.icon} />
         <Text style={styles.infoText}>{task.date}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -44,6 +53,18 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     // Elevation for Android
     elevation: 2,
+  },
+  statusBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginBottom: 12,
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   title: {
     fontSize: 16,
@@ -66,3 +87,6 @@ const styles = StyleSheet.create({
 });
 
 export default TaskCard;
+
+// Re-export Task type for backward compatibility
+export type { Task };

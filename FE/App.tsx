@@ -1,28 +1,31 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import TaskListScreen from './src/screens/Intern/TaskListScreen';
+import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      {/* Main Content Area */}
-      <View style={styles.content}>
-        <TaskListScreen />
-      </View>
-      
-      {/* Mock Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <View style={styles.navItem}>
-          <Ionicons name="grid" size={24} color="#000" />
-          <Text style={styles.activeNavText}>WORKSPACE</Text>
+    <NavigationContainer>
+      <View style={styles.container}>
+        {/* Main Content Area — handled by Navigator */}
+        <View style={styles.content}>
+          <AppNavigator />
         </View>
-        <View style={styles.navItem}>
-          <Ionicons name="person" size={24} color="#A0A0A0" />
-          <Text style={styles.navText}>PROFILE</Text>
+
+        {/* Mock Bottom Navigation */}
+        <View style={styles.bottomNav}>
+          <View style={styles.navItem}>
+            <Ionicons name="grid" size={24} color="#000" />
+            <Text style={styles.activeNavText}>WORKSPACE</Text>
+          </View>
+          <View style={styles.navItem}>
+            <Ionicons name="person" size={24} color="#A0A0A0" />
+            <Text style={styles.navText}>PROFILE</Text>
+          </View>
         </View>
       </View>
-    </View>
+    </NavigationContainer>
   );
 }
 
