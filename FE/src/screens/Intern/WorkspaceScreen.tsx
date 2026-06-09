@@ -1,21 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import TaskListScreen from './TaskListScreen';
 import ProfileScreen from './ProfileScreen';
-import { InternUser } from '../../store/useAuthStore';
+import useAuthStore from '../../store/useAuthStore';
+import { RootStackParamList } from '../../types/types';
+import { getUnreadCount } from '../../services/notificationService';
 
-interface WorkspaceScreenProps {
-  intern: InternUser;
-}
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Workspace'>;
 
-const WorkspaceScreen = ({ intern }: WorkspaceScreenProps) => {
+const WorkspaceScreen = () => {
   const [activeTab, setActiveTab] = useState<'WORKSPACE' | 'PROFILE'>('WORKSPACE');
+  const [unreadCount, setUnreadCount] = useState(0);
+  const { intern } = useAuthStore();
+  const navigation = useNavigation<NavigationProp>();
+
+  useFocusEffect(
+    useCallback(() => {
+      const checkUnread = async () => {
+        const count = await getUnreadCount();
+        setUnreadCount(count);
+      };
+      checkUnread();
+    }, [])
+  );
+
+  const handleBellPress = () => {
+    navigation.navigate('Notifications');
+  };
+
+  if (!intern) return null;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>{activeTab === 'WORKSPACE' ? 'MY WORKSPACE' : 'PROFILE'}</Text>
-        <Text style={styles.code}>Mã thực tập sinh: {intern.intern_code}</Text>
+        <View>
+          <Text style={styles.greeting}>{activeTab === 'WORKSPACE' ? 'MY WORKSPACE' : 'PROFILE'}</Text>
+          <Text style={styles.code}>Mã thực tập sinh: {intern.intern_code}</Text>
+        </View>
+        <TouchableOpacity style={styles.bellContainer} onPress={handleBellPress}>
+          <Ionicons name="notifications" size={24} color="#000" />
+          {unreadCount > 0 && <View style={styles.badge} />}
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
@@ -46,8 +74,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 48,
+    paddingTop: Platform.OS === 'android' ? 48 : 56,
     paddingBottom: 16,
     backgroundColor: '#FAFAFA',
   },
@@ -60,6 +91,18 @@ const styles = StyleSheet.create({
   code: {
     fontSize: 14,
     color: '#666',
+  },
+  bellContainer: {
+    padding: 4,
+  },
+  badge: {
+    position: 'absolute',
+    top: 4,
+    right: 6,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E53935', // Red dot
   },
   content: {
     flex: 1,

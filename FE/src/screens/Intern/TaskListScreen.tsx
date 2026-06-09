@@ -1,35 +1,37 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, ScrollView, Platform, StatusBar } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import TaskCard, { Task } from '../../components/TaskCard';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import TaskCard from '../../components/TaskCard';
+import { MOCK_TASKS } from '../../utils/mockData';
+import { RootStackParamList } from '../../types/types';
 
-const MOCK_TASKS: Task[] = [
-  { id: '1', title: 'Design System Documentation', mentor: 'John Doe', date: 'Mar 25, 2026' },
-  { id: '2', title: 'Core API Infrastructure', mentor: 'Sarah Chen', date: 'Apr 02, 2026' },
-  { id: '3', title: 'Mobile Wireframe Prototyping', mentor: 'Alex Rivera', date: 'Mar 28, 2026' },
-];
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Workspace'>;
 
 const TABS = ['IN PROGRESS', 'IN REVIEW', 'DONE', 'REJECTED'];
 
 const TaskListScreen = () => {
   const [activeTab, setActiveTab] = useState('IN PROGRESS');
+  const navigation = useNavigation<NavigationProp>();
 
-  // const renderHeader = () => (
-  //   <View style={styles.header}>
-  //     <Text style={styles.headerTitle}>My Workspace</Text>
-  //     <TouchableOpacity style={styles.bellContainer}>
-  //       <Ionicons name="notifications" size={24} color="#000" />
-  //       <View style={styles.badge} />
-  //     </TouchableOpacity>
-  //   </View>
-  // );
+  const handleTaskPress = (taskId: string) => {
+    navigation.navigate('TaskDetail', { taskId });
+  };
 
   const renderTabs = () => (
     <View style={styles.tabsContainer}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
         {TABS.map(tab => (
-          <TouchableOpacity 
-            key={tab} 
+          <TouchableOpacity
+            key={tab}
             style={[styles.tab, activeTab === tab && styles.activeTab]}
             onPress={() => setActiveTab(tab)}
           >
@@ -41,69 +43,37 @@ const TaskListScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {/* {renderHeader()} */}
-        
-        {/* Divider line below header */}
-        <View style={styles.divider} />
-        
-        {renderTabs()}
-        
-        <View style={styles.listHeader}>
-          <Text style={styles.listHeaderText}>ACTIVE ASSIGNMENTS (3)</Text>
-          <TouchableOpacity>
-            <Ionicons name="filter" size={20} color="#666" />
-          </TouchableOpacity>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.divider} />
+      {renderTabs()}
 
-        <FlatList
-          data={MOCK_TASKS}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <TaskCard task={item} />}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
+      <View style={styles.listHeader}>
+        <Text style={styles.listHeaderText}>ACTIVE ASSIGNMENTS ({MOCK_TASKS.length})</Text>
+        <TouchableOpacity>
+          <Ionicons name="filter" size={20} color="#666" />
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+
+      <FlatList
+        data={MOCK_TASKS}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <TaskCard
+            task={item}
+            onPress={() => handleTaskPress(item.id)}
+          />
+        )}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FAFAFA',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
   container: {
     flex: 1,
     backgroundColor: '#FAFAFA',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 20,
-    backgroundColor: '#FAFAFA',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  bellContainer: {
-    padding: 4,
-  },
-  badge: {
-    position: 'absolute',
-    top: 4,
-    right: 6,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#E53935', // Red dot
   },
   divider: {
     height: 1,

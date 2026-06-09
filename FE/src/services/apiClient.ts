@@ -1,3 +1,12 @@
+/**
+ * API Client — centralized HTTP client for Backend communication
+ * 
+ * Khi Backend sẵn sàng, cấu hình BASE_URL và implement các method.
+ */
+
+// TODO: Thay bằng URL Backend thật khi deploy
+const BASE_URL = 'http://localhost:3001/api';
+
 export interface InternVerifyPayload {
   intern_code: string;
 }
@@ -49,10 +58,8 @@ export interface InternDashboardResponse {
   message?: string;
 }
 
-const API_BASE_URL = 'http://localhost:3001';
-
 export async function verifyInternCode(internCode: string): Promise<InternVerifyResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
+  const response = await fetch(`${BASE_URL}/auth/verify`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -68,7 +75,7 @@ export async function verifyInternCode(internCode: string): Promise<InternVerify
 }
 
 export async function fetchInternDashboard(internId: string): Promise<InternDashboardResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/interns/${internId}/dashboard`);
+  const response = await fetch(`${BASE_URL}/interns/${internId}/dashboard`);
 
   if (!response.ok) {
     throw new Error('Network error');
@@ -76,3 +83,55 @@ export async function fetchInternDashboard(internId: string): Promise<InternDash
 
   return (await response.json()) as InternDashboardResponse;
 }
+
+/**
+ * Generic fetch wrapper với error handling
+ */
+export const apiClient = {
+  get: async <T>(endpoint: string): Promise<T> => {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        // TODO: Thêm auth token khi có authentication
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  },
+
+  post: async <T>(endpoint: string, body: unknown): Promise<T> => {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  },
+
+  upload: async <T>(endpoint: string, formData: FormData): Promise<T> => {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upload Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  },
+};
+
+export default apiClient;
