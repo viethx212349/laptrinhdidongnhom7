@@ -43,6 +43,7 @@ export interface TaskDetail {
   technicalBriefs: TechnicalBrief[];
   feedback?: MentorFeedback;       // Chỉ có khi status = NEEDS_REVISION
   submittedReport?: string;        // Nội dung báo cáo đã nộp trước đó (nếu có)
+  submittedLink?: string;          // Link file đã nộp trước đó (nếu có)
 }
 
 // =============================================================================
@@ -53,7 +54,7 @@ export interface Task {
   title: string;
   mentor: string;
   date: string;
-  status: TaskStatus;
+  status: TaskStatus | string;
 }
 
 // =============================================================================
@@ -64,6 +65,7 @@ export interface SubmitReportPayload {
   content: string;
   attachmentUri?: string;
   attachmentName?: string;
+  attachmentType?: string;
 }
 
 // =============================================================================
@@ -88,6 +90,7 @@ export interface Notification {
 // Navigation Param Types
 // =============================================================================
 export type RootStackParamList = {
+  Identity: undefined;
   Workspace: undefined;
   TaskDetail: { taskId: string };
   Notifications: undefined;

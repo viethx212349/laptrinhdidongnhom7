@@ -36,12 +36,11 @@ const WorkspaceScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>{activeTab === 'WORKSPACE' ? 'MY WORKSPACE' : 'PROFILE'}</Text>
-          <Text style={styles.code}>Mã thực tập sinh: {intern.intern_code}</Text>
-        </View>
+        <Text style={styles.greeting}>
+          {activeTab === 'WORKSPACE' ? 'My Workspace' : 'PROFILE'}
+        </Text>
         <TouchableOpacity style={styles.bellContainer} onPress={handleBellPress}>
-          <Ionicons name="notifications" size={24} color="#000" />
+          <Ionicons name="notifications-outline" size={26} color="#000" />
           {unreadCount > 0 && <View style={styles.badge} />}
         </TouchableOpacity>
       </View>
@@ -52,15 +51,17 @@ const WorkspaceScreen = () => {
 
       <View style={styles.bottomNav}>
         <TouchableOpacity
-          style={[styles.navItem, activeTab === 'WORKSPACE' && styles.navItemActive]}
+          style={styles.navItem}
           onPress={() => setActiveTab('WORKSPACE')}
         >
+          <Ionicons name="grid-outline" size={24} color={activeTab === 'WORKSPACE' ? "#000" : "#999"} />
           <Text style={[styles.navText, activeTab === 'WORKSPACE' && styles.navTextActive]}>WORKSPACE</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.navItem, activeTab === 'PROFILE' && styles.navItemActive]}
+          style={styles.navItem}
           onPress={() => setActiveTab('PROFILE')}
         >
+          <Ionicons name="person-outline" size={24} color={activeTab === 'PROFILE' ? "#000" : "#999"} />
           <Text style={[styles.navText, activeTab === 'PROFILE' && styles.navTextActive]}>PROFILE</Text>
         </TouchableOpacity>
       </View>
@@ -78,31 +79,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: Platform.OS === 'android' ? 48 : 56,
-    paddingBottom: 16,
+    paddingTop: Platform.OS === 'android' ? 48 : 64,
+    paddingBottom: 24,
     backgroundColor: '#FAFAFA',
   },
   greeting: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#111',
-    marginBottom: 6,
-  },
-  code: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#000000',
+    letterSpacing: -0.5,
   },
   bellContainer: {
     padding: 4,
+    position: 'relative',
   },
   badge: {
     position: 'absolute',
     top: 4,
-    right: 6,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#E53935', // Red dot
+    right: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#D32F2F',
+    borderWidth: 2,
+    borderColor: '#FAFAFA',
   },
   content: {
     flex: 1,
@@ -111,28 +111,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 14,
-    backgroundColor: '#FFFFFF',
-    borderTopColor: '#E8E8E8',
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 16,
+    backgroundColor: '#FAFAFA',
+    borderTopColor: '#EEEEEE',
     borderTopWidth: 1,
   },
   navItem: {
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  navItemActive: {
-    backgroundColor: '#000000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 100,
   },
   navText: {
-    color: '#7A7A7A',
-    fontSize: 12,
+    color: '#999999',
+    fontSize: 10,
     fontWeight: '700',
-    letterSpacing: 0.7,
+    letterSpacing: 1,
+    marginTop: 4,
   },
   navTextActive: {
-    color: '#FFFFFF',
+    color: '#000000',
   },
 });
 

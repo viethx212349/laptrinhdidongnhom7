@@ -1,0 +1,1414 @@
+--- LISTS ---
+[69b3e6dff58bb6e7e98daeca] To Do (Window)
+[69cd32044695334aeee0cf91] To Do (Mobile)
+[69b3e6dff58bb6e7e98daecb] Doing
+[69b3e6dff58bb6e7e98daecc] Done(window)
+[69b42cf129bae67d8c441f0d] Done (mobile)
+[6a101e8af5cd9b8f03a646f5] Note
+
+--- CARDS ---
+[69b3e6dff58bb6e7e98daeca] Hello
+--------------------
+[69b3e6dff58bb6e7e98daeca] ádasd
+--------------------
+[69b3e6dff58bb6e7e98daeca] [BE][Epic 1 - UC1.1] API Lấy danh sách Thực tập sinh
+1. **Mục tiêu (Goal)** Cung cấp cổng dữ liệu để hiển thị danh sách toàn bộ thực tập sinh lên bảng quản lý (Screen 1).
+
+1. **Tiêu chí nghiệm thu (AC)**
+
+- **[ ]** Truy vấn dữ liệu từ bảng `interns` trong MySQL.
+- **[ ]** Hỗ trợ phân trang (Pagination) thông qua tham số `page` và `limit`.
+- **[ ]** Trả về đầy đủ các trường: `id`, `fullName`, `internCode`, `position`, `email`, `phone`, `status`.
+
+1. **Đặc tả API (Contract)**
+
+- **Method:** `GET` | **Endpoint:** `/api/interns`
+- **Response:** Trả về mảng `items` kèm thông tin `pagination` (tổng số trang, tổng số bản ghi).
+--------------------
+[69b3e6dff58bb6e7e98daeca] [BE][Epic 1 - UC1.2] API Chi tiết & Thống kê Thực tập sinh
+1. **Mục tiêu (Goal)** Cung cấp toàn bộ thông tin hồ sơ, con số thống kê và lịch sử công việc của một cá nhân khi Mentor nhấn xem chi tiết (Screen 6).
+
+1. **Tiêu chí nghiệm thu (AC)**
+
+- **[ ]** Nhận `id` của thực tập sinh từ phía Frontend.
+- **[ ]** Thực hiện tính toán (Aggregate): Đếm tổng số task, task đã xong, task trễ hạn dựa trên bảng `tasks`.
+- **[ ]** Trình bày lịch sử công việc (Task History) sắp xếp theo ngày nộp mới nhất.
+
+1. **Đặc tả API (Contract)**
+
+- **Method:** `GET` | **Endpoint:** `/api/interns/{id}`
+- **Response:** Trả về một Object gồm 3 phần: `profile` (thông tin cá nhân), `stats` (3 con số thống kê), và `taskHistory` (danh sách các task đã làm).
+--------------------
+[69b3e6dff58bb6e7e98daeca] [BE][Epic 4 - UC4.1] API Đánh giá Tổng kết
+--------------------
+[69b3e6dff58bb6e7e98daeca] [BE][Epic 2 - UC2.2] API Lấy danh sách Task (Kanban Board)
+--------------------
+[69b3e6dff58bb6e7e98daeca] [BE][Epic 2 - UC2.1] API Tạo công việc mới
+1. **Mục tiêu (Goal)** Tiếp nhận dữ liệu từ form và lưu trữ nhiệm vụ mới vào hệ thống (Screen 5).
+
+1. **Tiêu chí nghiệm thu (AC)**
+
+- **[ ]** Kiểm tra tính hợp lệ của dữ liệu (Tiêu đề và Người nhận không được để trống).
+- **[ ]** Lưu thông tin vào bảng `tasks`, thiết lập trạng thái mặc định là `TODO`.
+- **[ ]** Nếu có tài liệu đính kèm, thực hiện lưu thông tin vào bảng `task_attachments` liên kết với task vừa tạo.
+
+1. **Đặc tả API (Contract)**
+
+- **Method:** `POST` | **Endpoint:** `/api/tasks`
+- **Body:** `{ "title": "...", "internId": "...", "dueDate": "...", "description": "...", "attachments": [...] }`
+- **Response:** Trả về Object task vừa được tạo thành công kèm ID.
+--------------------
+[69b3e6dff58bb6e7e98daeca] [BE][Epic 2 - UC2.3] API Cập nhật Task (Form & Drag-and-Drop)
+1. **Mục tiêu (Goal)** Cung cấp một cổng cập nhật linh hoạt cho cả việc sửa nội dung trong Modal và việc thay đổi trạng thái khi kéo thả thẻ trên bảng Kanban (Screen 4 & 7).
+
+1. **Tiêu chí nghiệm thu (AC)**
+
+- **[ ]** Nhận `id` của task cần cập nhật.
+- **[ ]** Logic linh hoạt (Partial Update): Chỉ cập nhật những trường dữ liệu mà Frontend gửi lên (Ví dụ: chỉ gửi `status` khi kéo thả, hoặc gửi cả bộ `title`, `description` khi sửa form).
+- **[ ]** Đảm bảo dữ liệu được cập nhật chính xác vào MySQL.
+
+1. **Đặc tả API (Contract)**
+
+- **Method:** `PUT` hoặc `PATCH` | **Endpoint:** `/api/tasks/{id}`
+- **Body:** Chấp nhận các trường đơn lẻ hoặc cả cụm dữ liệu (`title`, `status`, `dueDate`, `description`).
+- **Response:** Thông báo cập nhật thành công (Code 200).
+--------------------
+[69b3e6dff58bb6e7e98daeca] [BE][Epic 2 - UC2.3] API Xóa công việc
+--------------------
+[69b3e6dff58bb6e7e98daecb] [FE-Mobile][Setup] Thiết lập gọi API Backend và lưu phiên thực tập sinh
+## User Story
+
+Là thực tập sinh, tôi muốn Mobile App tự kết nối được với Backend và ghi nhớ thông tin của mình, để khi mở các màn hình Workspace, Task Detail, Profile hoặc Notification thì dữ liệu hiển thị đúng theo tài khoản thực tập sinh hiện tại.
+
+---
+
+## Mục tiêu
+
+Thiết lập phần nền cho Mobile App để các màn hình có thể gọi Backend API thống nhất, lưu thông tin thực tập sinh hiện tại và cập nhật lại dữ liệu sau khi người dùng thao tác.
+
+Sau task này, các màn hình như Workspace, Task Detail, Profile và Notification không cần tự viết logic gọi API riêng lẻ.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. Tạo cấu hình gọi API dùng chung
+
+Tạo phần gọi API dùng chung cho Mobile App.
+
+Phần này cần hỗ trợ:
+
+- lưu địa chỉ Backend API;
+- gửi request lên Backend;
+- nhận response từ Backend;
+- xử lý lỗi cơ bản khi API thất bại.
+
+Các màn hình Mobile sau này sẽ gọi Backend thông qua cấu hình chung này.
+
+---
+
+### 2. Lưu thông tin thực tập sinh hiện tại
+
+Mobile App cần biết thực tập sinh hiện tại là ai để lấy đ
+--------------------
+[69b3e6dff58bb6e7e98daecb] [BE] API Xác thực mã TTS & Cập nhật luồng lấy Task
+## Mục tiêu
+
+Tạo API để Mobile App kiểm tra mã thực tập sinh khi người dùng nhập vào màn hình đầu tiên.
+
+Nếu mã đúng, Backend trả về thông tin thực tập sinh để Mobile biết đang hiển thị dữ liệu của ai.
+
+Sau bước này, Mobile có thể vào các màn hình như Workspace, Profile, Notification và lấy đúng dữ liệu của thực tập sinh đó.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. Kiểm tra mã thực tập sinh
+
+Backend cần nhận mã thực tập sinh do Mobile gửi lên.
+
+Nếu mã tồn tại trong hệ thống, trả về thông tin cơ bản của thực tập sinh.
+
+Thông tin cần trả về gồm:
+
+- ID thực tập sinh
+- mã thực tập sinh
+- họ tên
+- email nếu có
+- vị trí/bộ phận thực tập nếu có
+- trạng thái thực tập nếu có
+
+---
+
+### 2. Xử lý mã không hợp lệ
+
+Nếu mã thực tập sinh không tồn tại, Backend cần trả lỗi rõ ràng để Mobile hiển thị cho người dùng.
+
+Ví dụ thông báo:
+
+```
+‌
+```
+
+```
+Mã thực tập sinh không hợp lệ.
+```
+
+Không để Mobile bị treo hoặc không biết lỗi gì.
+
+---
+
+### 3. Không lấy task trong API này
+
+API này chỉ dùng để kiểm tra mã thực 
+--------------------
+[69b3e6dff58bb6e7e98daecb] [BE-Mobile][Profile] API hồ sơ, dashboard và lịch sử công việc
+## Mục tiêu
+
+Xây dựng API cho Mobile App để thực tập sinh xem hồ sơ cá nhân, số liệu tổng quan và lịch sử các công việc đã được giao.
+
+Phần dashboard này cần đồng bộ với dữ liệu từ hệ thống Window App, để Mentor và Intern nhìn cùng một kết quả, chỉ khác góc nhìn sử dụng.
+
+Mobile App chỉ xem dữ liệu của chính thực tập sinh hiện tại.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. Trả thông tin hồ sơ thực tập sinh
+
+Backend cần trả về thông tin cơ bản của thực tập sinh hiện tại, gồm:
+
+- họ tên
+- mã thực tập sinh
+- email
+- số điện thoại nếu có
+- vị trí/bộ phận thực tập
+- trạng thái thực tập
+
+API chỉ trả dữ liệu của thực tập sinh hiện tại, không trả nhầm dữ liệu của thực tập sinh khác.
+
+---
+
+### 2. Trả số liệu dashboard
+
+Dashboard cần trả 3 chỉ số chính:
+
+```
+‌
+```
+
+```
+Tổng task
+Hoàn thành
+Trễ hạn
+```
+
+Ý nghĩa:
+
+- **Tổng task**: tổng số công việc đã được giao cho thực tập sinh.
+- **Hoàn thành**: số task đã được Mentor duyệt hoàn thành.
+- **Trễ hạn**: số task quá hạn hoặc bị hệ thống ghi nhận là trễ hạn.
+
+--------------------
+[69b3e6dff58bb6e7e98daecb] [BE-Mobile][Workspace] Nhóm API Không gian làm việc
+Thought for 10s
+
+Đúng, task này cần sửa lại để **bỏ thu hồi**, bỏ `FAIL`, bỏ FE tự tính quá hạn, và chuẩn hóa theo logic Intern Mobile.
+
+Bản chuẩn:
+
+---
+
+# [BE-Mobile][Workspace] Nhóm API Không gian làm việc
+
+## Mục tiêu
+
+Xây dựng nhóm API phục vụ màn hình **My Workspace** trên Mobile App, giúp thực tập sinh xem danh sách công việc của mình, xem chi tiết yêu cầu công việc và nộp báo cáo.
+
+Nhóm API này chỉ phục vụ nghiệp vụ của **Intern**, không xử lý nghiệp vụ của Mentor như tạo task, giao task, duyệt bài, yêu cầu sửa bài hoặc đánh giá cuối kỳ.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. API lấy danh sách công việc
+
+Tạo API lấy danh sách công việc của thực tập sinh hiện tại.
+
+API cần đảm bảo:
+
+- chỉ trả task thuộc về Intern hiện tại;
+- không trả task của Intern khác;
+- không trả task chưa liên quan đến Intern;
+- không trả task kiểu `TODO/MỚI GIAO` nếu trạng thái đó chỉ dùng cho phía Mentor.
+
+Mỗi task trong danh sách cần có tối thiểu:
+
+- id;
+- tên task;
+- mentor/người giao nếu có;
+- hạn nộp;
+- trạ
+--------------------
+[69b3e6dff58bb6e7e98daecc] [FE][EPIC2-UC2.2] Màn hình Bảng Kanban (Tiến độ công việc)
+## User Story
+
+Là Mentor, tôi muốn xem danh sách công việc của thực tập sinh dưới dạng Kanban Board, để có thể theo dõi nhanh task nào chưa gán, đang làm, chờ duyệt và đã hoàn thành.
+
+---
+
+## Mục tiêu
+
+Xây dựng màn hình Kanban Board cho Mentor Desktop App.
+
+Kanban chỉ dùng để hiển thị và theo dõi tiến độ task. Mentor không được kéo thả task để đổi trạng thái thủ công, vì trạng thái task phải thay đổi theo workflow nghiệp vụ từ Backend.
+
+---
+
+## Functional Requirements
+
+### FR1. Hiển thị Kanban Board với 4 cột chính
+
+Kanban phải có 4 cột:
+
+- TODO
+- IN_PROGRESS
+- IN_REVIEW
+- DONE
+
+Task được đưa vào cột dựa trên raw `status` Backend trả về.
+
+Mapping:
+
+- `status = TODO` → cột TODO
+- `status = IN_PROGRESS` → cột IN_PROGRESS
+- `status = IN_REVIEW` → cột IN_REVIEW
+- `status = DONE` → cột DONE
+
+Không tạo cột riêng cho `REJECTED` hoặc `OVERDUE`.
+
+---
+
+### FR2. Hiển thị thông tin trên task card
+
+Mỗi task card cần hiển thị:
+
+- Tên task
+- Tên Intern nếu đã được gán
+- Deadline nếu có
+- Badge trạng 
+--------------------
+[69b3e6dff58bb6e7e98daecc] frontend
+làm giao diện chính
+--------------------
+[69b3e6dff58bb6e7e98daecc] [FE][EPIC2-UC2.3] Modal Chỉnh sửa / Hủy công việc
+## User Story
+
+Là Mentor, tôi muốn xem và chỉnh sửa thông tin công việc khi task còn ở TODO hoặc IN_PROGRESS, để có thể cập nhật nội dung, người thực hiện, hạn hoàn thành hoặc tài liệu đính kèm trước khi task được nộp bài.
+
+---
+
+## Mục tiêu
+
+Xây dựng modal `Chi tiết công việc` theo đúng mockup.
+
+Modal này chỉ dùng để xem/chỉnh sửa task ở:
+
+- `TODO`
+- `IN_PROGRESS`
+
+Không dùng modal này để chỉnh sửa task ở:
+
+- `IN_REVIEW`
+- `DONE`
+
+---
+
+## Functional Requirements
+
+### FR1. Mở modal chi tiết công việc
+
+Mentor có thể mở modal khi click vào task ở cột:
+
+- TODO
+- IN_PROGRESS
+
+Modal hiển thị:
+
+- Tiêu đề công việc
+- Badge raw status hiện tại
+- Người thực hiện
+- Hạn hoàn thành
+- Mô tả công việc
+- Danh sách tài liệu đính kèm
+- Nút Xóa task
+- Nút Lưu thay đổi
+
+---
+
+### FR2. Trường hợp task ở TODO
+
+Task TODO là task chưa giao cho Intern.
+
+Khi mở task TODO:
+
+- Người thực hiện có thể để trống.
+- Hạn hoàn thành để trống.
+- Mentor có thể sửa tiêu đề, mô tả, tài liệu đính kèm.
+- Mentor có thể chọn ngư
+--------------------
+[69b3e6dff58bb6e7e98daecc] [FE][EPIC4-UC4.1] Modal Đánh giá Tổng kết Thực tập sinh
+## User Story
+
+Là Mentor, tôi muốn đánh giá tổng kết một thực tập sinh từ modal hồ sơ của họ, để chốt kết quả cuối kỳ là Đạt hoặc Không đạt và lưu nhận xét tổng quan.
+
+---
+
+## Mục tiêu
+
+Xây dựng modal `Đánh giá Thực tập sinh` theo đúng mockup.
+
+Modal này được mở khi Mentor click nút `TIẾN HÀNH ĐÁNH GIÁ` trong modal `THÔNG TIN THỰC TẬP SINH`.
+
+Modal dùng để:
+
+- Hiển thị nhanh thông tin thực tập sinh.
+- Nhập nhận xét chung từ Mentor.
+- Chọn kết quả cuối cùng: Đạt hoặc Không đạt.
+- Xác nhận đánh giá.
+
+---
+
+## Functional Requirements
+
+### FR1. Mở modal từ hồ sơ thực tập sinh
+
+Modal đánh giá chỉ được mở từ modal hồ sơ thực tập sinh.
+
+Khi mở modal, cần truyền thông tin Intern đang được chọn:
+
+- Avatar
+- Họ tên
+- Vị trí thực tập
+- ID Intern
+
+---
+
+### FR2. Hiển thị thông tin thực tập sinh
+
+Modal cần hiển thị:
+
+- Avatar
+- Họ tên
+- Vị trí thực tập
+
+Không cần hiển thị lại toàn bộ task history trong modal này, vì task history đã nằm ở modal hồ sơ thực tập sinh.
+
+---
+
+### FR3. Nhập nhận xét chung t
+--------------------
+[69b3e6dff58bb6e7e98daecc] [FE][EPIC3-UC3.1] Modal Nghiệm thu công việc (Xem báo cáo)
+## User Story
+
+Là Mentor, tôi muốn xem bài nộp của thực tập sinh và đưa ra quyết định duyệt hoặc yêu cầu làm lại, để đảm bảo task chỉ được hoàn thành khi kết quả đạt yêu cầu.
+
+---
+
+## Mục tiêu
+
+Xây dựng modal `Nghiệm thu công việc` theo đúng mockup.
+
+Modal dùng cho các task đang ở trạng thái `IN_REVIEW`.
+
+Mentor có thể:
+
+- Xem thông tin task đã nộp.
+- Xem người thực hiện và ngày nộp.
+- Mở tài liệu/link báo cáo đính kèm.
+- Nhập nhận xét.
+- Duyệt task.
+- Yêu cầu Intern làm lại.
+
+---
+
+## Functional Requirements
+
+### FR1. Hiển thị thông tin task nghiệm thu
+
+Modal cần hiển thị:
+
+- Tên công việc
+- Người thực hiện
+- Ngày nộp
+- Link hoặc tài liệu đính kèm
+- Ô nhập nhận xét từ Mentor
+
+Dữ liệu lấy từ API review task.
+
+---
+
+### FR2. Hiển thị action nghiệm thu
+
+Modal có 2 nút chính:
+
+- `YÊU CẦU LÀM LẠI`
+- `DUYỆT TASK`
+
+Chỉ hiển thị 2 nút này nếu task đang có:
+
+`status = IN_REVIEW`
+
+Nếu task không ở trạng thái `IN_REVIEW`, modal chỉ nên hiển thị thông tin ở chế độ xem.
+
+---
+
+### FR3. Duyệt task
+
+Kh
+--------------------
+[69b3e6dff58bb6e7e98daecc] [BE][Epic 2] Nhóm API Quản lý Công việc (Task CRUD)
+## Mục tiêu (Goal)
+
+Xây dựng nhóm API quản lý công việc cho Mentor Desktop App, bao gồm: tạo task, gán task cho Intern, lấy danh sách task, hiển thị Kanban, xem chi tiết, cập nhật và xóa task.
+
+API phải tuân theo thiết kế : Database chỉ lưu raw workflow status, còn Backend chịu trách nhiệm tính `display_status` để Frontend hiển thị badge/trạng thái.
+
+---
+
+## API cần xây dựng
+
+### 1. GET /api/tasks
+
+Lấy danh sách task.
+
+Hỗ trợ filter:
+
+- status
+- internId
+- keyword
+
+Mỗi task trả về cần có:
+
+- id
+- title
+- description
+- intern_id
+- intern_name
+- status
+- display_status
+- rejected_count
+- due_date
+- assigned_at
+- submitted_at
+- closed_at
+- created_at
+- updated_at
+
+---
+
+### 2. GET /api/tasks/kanban
+
+Lấy dữ liệu task cho bảng Kanban.
+
+Kanban chỉ có 4 cột:
+
+- TODO
+- IN_PROGRESS
+- IN_REVIEW
+- DONE
+
+Mapping:
+
+- TODO column: task có `status = TODO`
+- IN_PROGRESS column: task có `status = IN_PROGRESS`
+- IN_REVIEW column: task có `status = IN_REVIEW`
+- DONE column: task có `status = DONE`
+
+Không 
+--------------------
+[69b3e6dff58bb6e7e98daecc] [BE][Epic 3] API Nghiệm thu & Phản hồi Công việc (Task Review)
+## Mục tiêu
+
+Xây dựng API nghiệm thu công việc để Mentor xử lý các task mà Intern đã nộp bài từ Mobile App.
+
+API cần hỗ trợ:
+
+- Lấy danh sách task đang chờ duyệt.
+- Xem chi tiết bài nộp của Intern.
+- Mentor Approve hoặc Reject task kèm feedback.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. API lấy danh sách task chờ duyệt
+
+Tạo API lấy các task có `status = IN_REVIEW`.
+
+Dữ liệu dùng để hiển thị danh sách/cột chờ duyệt trên Desktop App.
+
+---
+
+### 2. API xem chi tiết bài nộp
+
+Tạo API lấy chi tiết một task đã được Intern submit.
+
+Cần có đủ thông tin:
+
+- Thông tin task
+- Thông tin Intern
+- Nội dung/link bài nộp
+- Thời điểm nộp
+- Feedback cũ nếu có
+- Số lần từng bị reject
+- `display_status`
+
+---
+
+### 3. API Approve / Reject task
+
+Tạo API cho Mentor xử lý kết quả nghiệm thu.
+
+Khi Approve:
+
+- Task chuyển từ `IN_REVIEW` sang `DONE`.
+- Ghi nhận thời điểm đóng task.
+- Trả về `display_status = COMPLETED`.
+
+Khi Reject:
+
+- Task chuyển từ `IN_REVIEW` về `IN_PROGRESS`.
+- Bắt buộc có feedback của Mentor.
+- Tăng `r
+--------------------
+[69b3e6dff58bb6e7e98daecc] [FE][EPIC2-UC2.1]Modal Tạo Công Việc Mới (Giao Task)
+## User Story
+
+Là Mentor, tôi muốn tạo công việc mới và có thể chọn gán ngay cho một thực tập sinh hoặc lưu tạm vào backlog, để linh hoạt chuẩn bị task trước khi giao việc chính thức.
+
+---
+
+## Mục tiêu
+
+Xây dựng modal `TẠO CÔNG VIỆC MỚI` theo đúng mockup.
+
+Form cho phép Mentor:
+
+- Tạo task chưa gán người nhận → đưa vào cột TODO.
+- Tạo task có người nhận + hạn chót → đưa vào cột IN_PROGRESS.
+
+---
+
+## Functional Requirements
+
+### FR1. Hiển thị form tạo task
+
+Modal cần có các trường:
+
+- Tiêu đề
+- Người nhận
+- Hạn chót
+- Mô tả chi tiết
+- Đính kèm tệp hoặc ảnh
+
+Trường `Tiêu đề` là bắt buộc.
+
+Trường `Người nhận` không bắt buộc.
+
+---
+
+### FR2. Tạo task chưa gán người nhận
+
+Nếu Mentor không chọn `Người nhận`:
+
+- Task được tạo vào cột TODO.
+- Task được hiểu là task backlog / planning task.
+- Task chưa xuất hiện trên Mobile App của Intern.
+- Không cho chọn hoặc gửi `Hạn chót`.
+
+Dữ liệu gửi lên Backend:
+
+- `intern_id = null`
+- `due_date = null`
+
+Backend xử lý:
+
+- `status = TODO`
+- `assigned_at = 
+--------------------
+[69b3e6dff58bb6e7e98daecc] [FE][EPIC1-UC1.2]Chi tiết Thông tin Thực tập sinh
+## User Story
+
+Là Mentor, tôi muốn mở nhanh thông tin chi tiết của một thực tập sinh trong modal, để xem hồ sơ cơ bản, thống kê công việc, lịch sử task và thực hiện các hành động như tải CV hoặc tiến hành đánh giá.
+
+---
+
+## Mục tiêu
+
+Xây dựng modal `THÔNG TIN THỰC TẬP SINH` theo đúng mockup.
+
+Modal cần hiển thị:
+
+- Thông tin cá nhân của thực tập sinh
+- Thống kê task tổng quan
+- Lịch sử công việc
+- Nút tải CV
+- Nút tiến hành đánh giá
+
+---
+
+## Functional Requirements
+
+### FR1. Hiển thị thông tin thực tập sinh
+
+Modal cần hiển thị các thông tin chính:
+
+- Avatar
+- Họ tên
+- Trạng thái thực tập
+- Vị trí thực tập
+- Email
+- Số điện thoại
+- Trường học
+
+Trạng thái thực tập hiển thị theo `intern.status`:
+
+- `ACTIVE` → Đang thực tập
+- `PASSED` → Đã đạt
+- `FAILED` → Không đạt
+
+---
+
+### FR2. Hiển thị thống kê task
+
+Modal hiển thị 3 ô thống kê chính:
+
+- `TỔNG TASK`
+- `HOÀN THÀNH`
+- `TRỄ HẠN`
+
+Logic dữ liệu lấy từ Backend:
+
+- `TỔNG TASK`: tổng số task đã giao cho Intern
+- `HOÀN THÀNH`: số task có `disp
+--------------------
+[69b3e6dff58bb6e7e98daecc] [FE][EPIC1-UC1.1] Danh sách Thực tập sinh & Layout tổng
+1. **User Story** Là Admin/Mentor, tôi muốn có bộ khung điều hướng và xem danh sách Thực tập sinh (dạng bảng) để quản lý trạng thái của họ.
+
+1. **Tiêu chí nghiệm thu (UI/UX)**
+
+- **Layout:** Sidebar (cố định trái), Header (cố định trên). Vùng Table tự động cuộn khi dữ liệu dài.
+- **Menu:** Hiển thị Active state ở "Danh sách TTS". Dưới cùng có Avatar & Tên User.
+- **Table:** Hiển thị 5 cột (Họ tên/Mã, Vị trí, Email, SĐT, Trạng thái). Có hiệu ứng `hover` khi di chuột.
+- **Components:** Dùng chung `Badge` (cho Vị trí, Trạng thái) và Nút FAB `+` (màu đen, góc phải dưới).
+
+1. **Ràng buộc Kỹ thuật (Frontend)**
+
+- **Stack:** React (TSX), Tailwind CSS, `lucide-react`.
+- **Clean Code:** Bắt buộc tách các file độc lập: `Sidebar.tsx`, `Header.tsx`, `Badge.tsx`, `DataTable.tsx`.
+
+1. **Ràng buộc chờ ghép API (Frontend Guidelines)**
+
+- **Data Hook:** Tuyệt đối không hardcode mảng dữ liệu thẳng vào giao diện. Phải bọc qua một Custom Hook (ví dụ trả về `data`, `isLoading`) chứa Mock Data để sẵn sàng t
+--------------------
+[69b3e6dff58bb6e7e98daecc] [BE][Database] Thiết lập Cấu trúc CSDL Supabase (Core Schema & Business Logic)
+**Mục tiêu (Goal)** Thiết lập hệ thống cơ sở dữ liệu PostgreSQL trên Supabase cho dự án InternFlow. Yêu cầu không chỉ tạo cấu trúc bảng (Schema) mà phải thiết lập sẵn các Triggers, Functions và Cronjob để tự động hóa luồng trạng thái của Task (Kanban).
+
+**Tiêu chí nghiệm thu (Acceptance Criteria)**
+
+**[ ] 1. Khởi tạo Kiểu dữ liệu (Enums):** Bắt buộc tạo các Enum sau trước khi tạo bảng để tránh rác dữ liệu:
+
+- `intern_status`: 'ACTIVE', 'PASSED', 'FAILED'
+- `task_status`: 'TODO', 'IN\_PROGRESS', 'IN\_REVIEW', 'DONE', 'REJECTED', 'OVERDUE'
+- `attachment_type`: 'MENTOR\_DOC', 'INTERN\_SUBMIT'
+- `notification_type`: 'NEW_TASK', 'REMINDER', 'REJECTED'
+
+**[ ] 2. Khởi tạo Bảng (Tables) & Khóa ngoại (Relations):** Sử dụng `UUID` sinh tự động (`gen_random_uuid()`) cho tất cả các Primary Key. Dùng `TIMESTAMPTZ` cho thời gian. Thiết lập `ON DELETE CASCADE` cho các Foreign Key.
+
+- **Bảng** `interns`: `id`, `full_name`, `intern_code`, `position`, `email`, `phone`, `school`, `status` (Enum `intern_s
+--------------------
+[69b3e6dff58bb6e7e98daecc] [BE][Setup] Khởi tạo Codebase & Cấu hình Prisma ORM (Kiến trúc 3-Tier)
+## Mục tiêu
+
+Khởi tạo Backend Node.js/Express bằng TypeScript cho dự án InternFlow.
+
+Thiết lập kiến trúc 3 lớp và cấu hình Prisma ORM để kết nối với PostgreSQL database trên Supabase đã có sẵn schema.
+
+Backend này sẽ là lớp trung gian giữa:
+
+- Mentor Desktop App
+- Intern Mobile App
+- Supabase PostgreSQL Database
+
+---
+
+## Yêu cầu cần làm
+
+### 1. Khởi tạo project Backend
+
+Cài đặt môi trường Node.js/Express với TypeScript.
+
+Dependencies cần cài:
+
+- express
+- cors
+- dotenv
+- \@prisma/client
+- zod
+
+DevDependencies cần cài:
+
+- typescript
+- \@types/node
+- \@types/express
+- \@types/cors
+- ts-node-dev
+- prisma
+
+Cấu hình:
+
+- `tsconfig.json` bật `strict: true`
+- `package.json` có script:
+
+```json
+"dev": "ts-node-dev src/server.ts"
+```
+--------------------
+[69b3e6dff58bb6e7e98daecc] [SYSTEM][API Contract] Task Status & Display Mapping
+## Mục tiêu
+
+Định nghĩa chuẩn mapping giữa raw task status trong database và display_status do Backend trả về, để Backend, Desktop App và Mobile App dùng thống nhất một logic.
+
+Task này đóng vai trò là rule chung cho toàn bộ hệ thống InternFlow.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. Chuẩn hóa raw task status
+
+Database chỉ lưu 4 raw status:
+
+- TODO
+- IN_PROGRESS
+- IN_REVIEW
+- DONE
+
+Không dùng các trạng thái sau làm database status:
+
+- REJECTED
+- OVERDUE
+
+---
+
+### 2. Chuẩn hóa display_status
+
+Backend cần tính và trả về `display_status` cho Frontend.
+
+Mapping chuẩn:
+
+- `status = TODO`
+  → `display_status = UNASSIGNED`
+- `status = IN_PROGRESS` và `rejected_count = 0`
+  → `display_status = IN_PROGRESS`
+- `status = IN_PROGRESS` và `rejected_count > 0`
+  → `display_status = NEEDS_REVISION`
+- `status = IN_REVIEW`
+  → `display_status = WAITING_REVIEW`
+- `status = DONE` và `submitted_at != null`
+  → `display_status = COMPLETED`
+- `status = DONE` và `submitted_at = null`
+  → `display_status = OVERDUE`
+--------------------
+[69b3e6dff58bb6e7e98daecc] [BE][Epic 1 & 4] Nhóm API Quản lý Thực tập sinh & Đánh giá (Intern Lifecycle)
+## Mục tiêu
+
+Xây dựng API quản lý hồ sơ thực tập sinh và đánh giá cuối kỳ cho Mentor Desktop App.
+
+API cần hỗ trợ:
+
+- Lấy danh sách thực tập sinh.
+- Xem chi tiết hồ sơ thực tập sinh.
+- Trả thống kê và lịch sử công việc.
+- Chốt kết quả thực tập: PASSED / FAILED.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. API lấy danh sách thực tập sinh
+
+Tạo API lấy danh sách Intern để hiển thị trên màn hình quản lý thực tập sinh.
+
+Dữ liệu cần có:
+
+- Họ tên
+- Mã thực tập sinh
+- Vị trí thực tập
+- Email / số điện thoại
+- Trường học
+- Trạng thái: `ACTIVE`, `PASSED`, `FAILED`
+
+Lưu ý:
+
+- API/dropdown giao task chỉ nên lấy Intern đang `ACTIVE`.
+
+---
+
+### 2. API xem chi tiết hồ sơ thực tập sinh
+
+Tạo API lấy chi tiết một Intern để hiển thị trong modal `THÔNG TIN THỰC TẬP SINH`.
+
+Dữ liệu cần có:
+
+- Thông tin cá nhân
+- Trạng thái thực tập
+- Feedback tổng kết nếu đã đánh giá
+- Thống kê task
+- Lịch sử công việc
+
+Thống kê cần trả:
+
+- `total_tasks`: tổng task đã giao
+- `completed_count`: số task hoàn thành
+- `overdue_count`: số
+--------------------
+[69b3e6dff58bb6e7e98daecc] [BE][Automation] Auto-close Overdue Tasks
+## Mục tiêu
+
+Xây dựng logic Backend tự động đóng các task quá hạn nếu Intern chưa nộp bài đúng deadline.
+
+Task quá hạn không tạo status OVERDUE trong database. Backend chỉ chuyển task về DONE và trả `display_status = OVERDUE` khi hiển thị.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. Điều kiện kiểm tra task quá hạn
+
+Backend chỉ kiểm tra các task có:
+
+- `status = IN_PROGRESS`
+- `due_date < now()`
+- `submitted_at = null`
+
+Không kiểm tra task ở trạng thái:
+
+- TODO
+- IN_REVIEW
+- DONE
+
+---
+
+### 2. Logic xử lý overdue
+
+Khi một task bị quá hạn:
+
+- Chuyển `status = DONE`
+- Set `closed_at = now()`
+- Giữ `submitted_at = null`
+- Có thể lưu `mentor_feedback` mặc định nếu cần
+
+Ví dụ feedback mặc định:
+
+```text
+Task was automatically closed because the deadline passed without submission.
+```
+--------------------
+[69b42cf129bae67d8c441f0d] [FE][Epic 4] Màn hình Thông báo (Notifications)
+## User Story
+
+Là thực tập sinh, tôi muốn xem các thông báo liên quan đến công việc của mình, để không bỏ lỡ các cập nhật quan trọng như được giao việc mới, sắp đến hạn, hoặc cần sửa bài nộp.
+
+---
+
+## Mục tiêu
+
+Xây dựng màn hình Notifications cho Mobile App theo mockup hiện tại.
+
+Màn hình hiển thị danh sách thông báo của thực tập sinh, có trạng thái chưa đọc/đã đọc và có thể mở từ icon chuông trên header.
+
+---
+
+## Tiêu chí nghiệm thu
+
+### AC1: Hiển thị chấm đỏ khi có thông báo chưa đọc
+
+**Given** thực tập sinh có thông báo chưa đọc.
+
+**Then** icon chuông ở header hiển thị chấm đỏ.
+
+---
+
+### AC2: Mở màn hình Notifications
+
+**Given** người dùng bấm vào icon chuông.
+
+**Then** màn hình Notifications được mở dạng modal hoặc full-screen theo mockup.
+
+**And** có nút `X` để đóng màn hình.
+
+---
+
+### AC3: Đánh dấu thông báo đã đọc
+
+**Given** icon chuông đang có chấm đỏ.
+
+**When** người dùng mở màn hình Notifications.
+
+**Then** chấm đỏ biến mất.
+
+**And** hệ thống gọi API đánh dấu các thông báo là
+--------------------
+[69b42cf129bae67d8c441f0d] [BE][Mobile] Nhóm API Thông báo (Notification Domain)
+## Mục tiêu
+
+Xây dựng nhóm API quản lý thông báo in-app cho thực tập sinh trên Mobile App.
+
+API giúp Intern xem các cập nhật quan trọng liên quan đến công việc như:
+
+- được giao task mới;
+- task sắp đến hạn;
+- Mentor yêu cầu sửa bài nộp;
+- task đã được duyệt nếu hệ thống có hỗ trợ.
+
+Thông báo có thể gắn với `task_id` để khi Intern bấm vào thì Mobile điều hướng sang màn hình chi tiết task tương ứng.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. API lấy danh sách thông báo
+
+Tạo API lấy danh sách thông báo của thực tập sinh hiện tại.
+
+```
+‌
+```
+
+```
+GET /api/me/notifications
+```
+
+Backend cần:
+
+- ‌
+  chỉ lấy thông báo của Intern hiện tại;
+- ‌
+  sắp xếp thông báo mới nhất lên đầu;
+- ‌
+  hỗ trợ phân trang nếu có `page`, `limit`;
+- ‌
+  mặc định có thể trả về 20 thông báo gần nhất.
+
+Mỗi notification cần trả về:
+
+- ‌
+  id
+- ‌
+  title
+- ‌
+  message
+- ‌
+  type
+- ‌
+  is_read
+- ‌
+  created_at
+- ‌
+  task_id nếu thông báo liên quan đến task
+
+Các loại thông báo nên dùng theo nghiệp vụ Mobile:
+
+```
+‌
+```
+
+```
+NEW_T
+--------------------
+[69b42cf129bae67d8c441f0d] [FE][Epic 2] Màn hình Task Details & Nộp báo cáo
+## User Story
+
+Là thực tập sinh, tôi muốn xem chi tiết yêu cầu công việc, xem tài liệu Mentor gửi, nộp báo cáo và xem phản hồi nếu Mentor yêu cầu sửa, để hoàn thành công việc đúng yêu cầu.
+
+---
+
+## Mục tiêu
+
+Xây dựng màn hình **Task Details** cho Mobile App theo mockup hiện tại.
+
+Màn hình cho phép Intern:
+
+- xem thông tin chi tiết task;
+- xem tài liệu đính kèm;
+- nhập nội dung báo cáo;
+- đính kèm file nếu có;
+- nộp báo cáo;
+- xem feedback nếu task cần sửa;
+- bị khóa form nếu task không còn được phép nộp.
+
+FE chỉ hiển thị và khóa/mở form theo dữ liệu Backend trả về.
+
+---
+
+## Tiêu chí nghiệm thu
+
+### AC1: Xem chi tiết công việc
+
+**Given** người dùng mở màn hình Task Details.
+
+**Then** màn hình hiển thị đúng các thông tin:
+
+- tiêu đề task;
+- due date;
+- assignee hoặc người liên quan theo dữ liệu trả về;
+- description;
+- danh sách technical briefs/tài liệu đính kèm.
+
+**And** khi bấm vào tài liệu, người dùng có thể mở hoặc tải file/link tài liệu.
+
+---
+
+### AC2: Nộp báo cáo
+
+**Given** task đ
+--------------------
+[69b42cf129bae67d8c441f0d] [FE-Mobile][Identity] Màn hình nhập mã thực tập sinh
+## User Story
+
+Là thực tập sinh, tôi muốn nhập mã thực tập sinh để truy cập vào Mobile App, để hệ thống hiển thị đúng Workspace, Profile và Notification của tôi.
+
+---
+
+## Mục tiêu
+
+Tạo màn hình đầu tiên của Mobile App để thực tập sinh nhập mã thực tập sinh.
+
+Sau khi mã hợp lệ, Mobile lưu thông tin Intern hiện tại và cho phép người dùng vào app.
+
+Đây là luồng định danh đơn giản cho MVP, không phải đăng nhập bằng tài khoản/mật khẩu.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. Dựng màn hình nhập mã
+
+Màn hình gồm:
+
+- ô nhập mã thực tập sinh;
+- nút `Vào hệ thống`;
+- trạng thái loading khi đang kiểm tra mã;
+- thông báo lỗi nếu mã không hợp lệ.
+
+Ví dụ placeholder:
+
+```
+‌
+```
+
+```
+Nhập mã thực tập sinh
+```
+
+---
+
+### 2. Gọi API kiểm tra mã thực tập sinh
+
+Khi người dùng bấm `Vào hệ thống`, FE gọi API Backend Mobile để kiểm tra mã.
+
+Ví dụ:
+
+```
+‌
+```
+
+```
+POST /api/auth/verify
+```
+
+Payload gửi lên:
+
+```
+‌
+```
+
+```
+{
+  "intern_code": "TTS001"
+}
+```
+
+Nếu mã hợp lệ, Backend trả về thông tin Intern, tối thiểu g
+--------------------
+[69b42cf129bae67d8c441f0d] [FE-Mobile][Profile] Màn hình Dashboard & Lịch sử công việc
+## User Story
+
+Là thực tập sinh, tôi muốn xem được tổng quan kết quả thực tập và lịch sử các công việc đã làm, để biết mình đã hoàn thành bao nhiêu việc, có task nào trễ hạn và task nào đang cần chú ý.
+
+---
+
+## Mục tiêu
+
+Xây dựng màn hình Profile/Dashboard cho Mobile App theo định hướng trong ảnh mẫu, gồm phần thông tin cá nhân, số liệu tổng quan và lịch sử công việc.
+
+Màn hình này hiển thị dữ liệu của chính thực tập sinh đang dùng app và phải đồng bộ logic với phần Mentor xem kết quả thực tập sinh trên Window App.
+
+---
+
+## Yêu cầu hiển thị
+
+### 1. Hiển thị các ô thống kê
+
+Màn hình cần hiển thị 3 chỉ số chính:
+
+```
+‌
+```
+
+```
+TỔNG TASK
+HOÀN THÀNH
+TRỄ HẠN
+```
+
+Không hiển thị ô `FAIL`.
+
+Nếu thiết kế cũ đang để `FAIL`, đổi thành:
+
+```
+‌
+```
+
+```
+TRỄ HẠN
+```
+
+Vì task bị Mentor yêu cầu sửa không phải là thất bại cuối cùng.
+
+---
+
+### 2. Hiển thị lịch sử công việc
+
+Bên dưới dashboard cần hiển thị danh sách lịch sử công việc của thực tập sinh.
+
+Mỗi item hiển thị:
+
+- ‌
+  tên task
+- ‌
+  ngày hạn
+--------------------
+[69b42cf129bae67d8c441f0d] [FE][Epic 1]Màn hình Workspace (Task Cá nhân)
+Thought for 4s
+
+Dưới đây là bản hoàn chỉnh đã sửa theo logic mới:
+
+---
+
+# [FE-Mobile][Workspace] Màn hình Workspace - Danh sách công việc cá nhân
+
+## User Story
+
+Là thực tập sinh, tôi muốn xem danh sách các công việc được giao theo từng trạng thái, để biết việc nào đang làm, việc nào cần sửa, việc nào đang chờ duyệt, việc nào đã hoàn thành và việc nào bị trễ hạn.
+
+---
+
+## Mục tiêu
+
+Xây dựng màn hình **My Workspace** cho Mobile App, hiển thị danh sách công việc cá nhân của thực tập sinh hiện tại.
+
+Màn hình cần lấy dữ liệu từ Backend Mobile và hiển thị trạng thái task theo đúng nghiệp vụ InternFlow.
+
+FE Mobile không tự tính trạng thái task, không tự xác định task quá hạn, mà hiển thị theo dữ liệu Backend trả về.
+
+---
+
+## Yêu cầu hiển thị
+
+### 1. Hiển thị màn hình Workspace
+
+Màn hình Workspace cần có:
+
+- tiêu đề `My Workspace`
+- icon thông báo ở góc phải
+- thanh tab trạng thái
+- danh sách task card
+- bottom navigation gồm `Workspace` và `Profile`
+
+Khi mở màn hình, tab mặc định nên là:
+
+``
+--------------------
+[69b42cf129bae67d8c441f0d] [BE-Mobile][Setup] Khởi tạo Backend Base cho Mobile App
+## Mục tiêu
+
+Khởi tạo Backend riêng cho Mobile App trong hệ thống InternFlow.
+
+Backend này phục vụ cho app Mobile của **thực tập sinh**, dùng để lấy dữ liệu cá nhân, công việc được giao, bài nộp, hồ sơ, thống kê và thông báo.
+
+Backend Mobile sử dụng chung database Supabase hiện có với Window App, không tạo database riêng và không thiết kế lại nghiệp vụ khác với hệ thống chính.
+
+---
+
+## Yêu cầu cần làm
+
+### 1. Khởi tạo Backend riêng cho Mobile App
+
+Tạo một Backend riêng dành cho Mobile App, tách biệt với Backend đang phục vụ Window App.
+
+Backend này cần chạy độc lập để Mobile Frontend có thể gọi API trong quá trình phát triển.
+
+---
+
+### 2. Dùng chung database với hệ thống InternFlow
+
+Backend Mobile phải kết nối với database Supabase hiện có.
+
+Không tạo database mới cho Mobile.
+Không tạo schema riêng cho Mobile.
+Không đổi lại cấu trúc dữ liệu đã thống nhất.
+
+Backend Mobile cần đọc và ghi dữ liệu theo đúng các bảng nghiệp vụ hiện có của InternFlow.
+
+---
+
+### 3. Chuẩn bị nền API cho thực t
+--------------------
+[6a101e8af5cd9b8f03a646f5] phần database
+Database hiện có 4 bảng chính:
+
+- `interns`: lưu thông tin thực tập sinh
+- `tasks`: lưu công việc và trạng thái workflow
+- `task_attachments`: lưu file đính kèm
+- `notifications`: lưu thông báo cho Intern
+
+Lưu ý phần task:
+
+Database chỉ lưu raw status gồm:
+`TODO`, `IN_PROGRESS`, `IN_REVIEW`, `DONE`
+
+Các nhãn như “Hoàn thành”, “Trễ hạn”, “Cần sửa”, “Chờ duyệt” sẽ do Backend API tính từ dữ liệu thô như `status`, `due_date`, `submitted_at`, `closed_at`, `rejected_count`.
+
+Vì vậy frontend không tự tạo logic riêng, chỉ hiển thị theo field mà backend trả về, ví dụ `display_status`.
+--------------------
+[6a101e8af5cd9b8f03a646f5] [MASTER CONTEXT] Window App (Mentor) - Kiến trúc, Database & Luồng Nghiệp vụ
+## MỤC TIÊU CỐT LÕI (CORE OBJECTIVES)
+
+Window App là giao diện Desktop dành cho Mentor để quản lý thực tập sinh, giao việc, theo dõi tiến độ, nghiệm thu báo cáo và đánh giá kết quả thực tập.
+
+Trong giai đoạn MVP, hệ thống sử dụng Single User Context:
+
+- Chỉ có 1 tài khoản Mentor mặc định.
+- Không xây dựng luồng đăng nhập cho Mentor.
+- Không cần bảng `mentors`.
+- Không cần cột `mentor_id` trong database.
+
+Database Supabase chỉ đóng vai trò lưu trữ dữ liệu thô. Các nhãn hiển thị như “Hoàn thành”, “Trễ hạn”, “Cần sửa”, “Chờ duyệt” sẽ do Backend API tính toán và trả về cho Frontend.
+
+---
+
+## KIẾN TRÚC TỔNG QUAN
+
+Window App sử dụng kiến trúc Client - Server:
+
+- Window App / Desktop Client: React + Electron.
+- Backend API: xử lý business logic, tính toán display status, validate request.
+- Database: PostgreSQL trên Supabase, chỉ lưu dữ liệu thô.
+- Mobile App: Intern sử dụng để xem task, nộp bài và nhận feedback.
+
+Window App không truy cập database trực tiếp. Mọi thao tác phải đi qua Backend 
+--------------------
+[6a101e8af5cd9b8f03a646f5] [MASTER CONTEXT] Mobile App (Intern) - Kiến trúc, UI State & Luồng Nghiệp vụ
+## 1. Vai trò của Mobile App
+
+Mobile App là ứng dụng dành riêng cho **Thực tập sinh**.
+
+Intern sử dụng Mobile App để:
+
+- xác định danh tính bằng mã thực tập sinh;
+- xem danh sách công việc được giao;
+- xem chi tiết yêu cầu công việc;
+- nộp báo cáo;
+- xem feedback nếu Mentor yêu cầu sửa;
+- xem hồ sơ cá nhân, dashboard và lịch sử công việc;
+- xem thông báo liên quan đến công việc.
+
+Mobile App **không xử lý nghiệp vụ của Mentor** như tạo task, giao task, duyệt bài, yêu cầu sửa bài hoặc đánh giá cuối kỳ.
+
+---
+
+## 2. Kiến trúc hệ thống
+
+Mobile App gọi **Backend Mobile** để lấy dữ liệu.
+
+Luồng tổng quát:
+
+```
+‌
+```
+
+```
+Mobile App
+→ Backend Mobile
+→ Supabase Database chung
+```
+
+Mobile App không gọi trực tiếp Supabase/database.
+
+Backend Mobile dùng chung database với Window App, nhưng chỉ phục vụ nghiệp vụ của Intern.
+
+---
+
+## 3. Định danh thực tập sinh
+
+Mobile App không làm đăng nhập phức tạp bằng tài khoản/mật khẩu.
+
+Trong MVP, Intern sẽ nhập **mã thực tập sinh** để xác định danh tính.
+
+Luồ
+--------------------
+[6a101e8af5cd9b8f03a646f5] quy trình chuẩn(phải đọc)
+# Quy trình làm việc (Git Workflow) cho InternFlow
+
+Mục tiêu: Thống nhất cách lấy code từ GitHub, cách chia nhánh làm việc và cách đẩy code lên lại GitHub để các thành viên FE/BE không làm đè code nhau.
+
+Dự án sử dụng cấu trúc **Monorepo** (cả FE và BE nằm chung 1 repo). Thành viên không tạo project mới từ đầu, mà clone repo phân công về máy để code tiếp.
+
+## Cấu trúc Repository hiện tại
+
+```
+text
+```
+
+```
+phattrienungdungnhom7/ (Repository duy nhất)
+│
+├── internflow-fe/        # Thư mục chứa code Frontend (Desktop App)
+│
+├── internflow-be/        # Thư mục chứa code Backend (API Server)
+│
+└── Supabase Database     # Database chung trên Cloud
+```
+
+---
+
+## I. Lấy code lần đầu trên máy (Chỉ làm 1 lần duy nhất)
+
+Bước này chỉ làm khi thành viên mới lấy project về máy lần đầu. Không clone lại project mỗi lần code task mới.
+
+### Bước 1: Clone Repository chung
+
+Chỉ cần chạy 1 lệnh clone duy nhất để lấy toàn bộ dự án:
+
+```
+bash
+```
+
+```
+git clone https://github.com/viethx212349/phattrienungdun
+--------------------

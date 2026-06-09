@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -18,10 +19,10 @@ import useAuthStore from '../../store/useAuthStore';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Workspace'>;
 
-const TABS = ['IN PROGRESS', 'NEEDS REVISION', 'IN REVIEW', 'DONE'];
+const TABS = ['ĐANG LÀM', 'CẦN SỬA', 'CHỜ DUYỆT', 'HOÀN THÀNH', 'TRỄ HẠN'];
 
 const TaskListScreen = () => {
-  const [activeTab, setActiveTab] = useState('IN PROGRESS');
+  const [activeTab, setActiveTab] = useState('ĐANG LÀM');
   const [tasks, setTasks] = useState<InternDashboardTask[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp>();
@@ -35,8 +36,9 @@ const TaskListScreen = () => {
       if (res.success && res.data) {
         setTasks(res.data.tasks);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch tasks:', error);
+      Alert.alert('Lỗi kết nối', error.message || 'Không thể lấy dữ liệu công việc. Vui lòng kiểm tra lại kết nối Backend.');
     } finally {
       setLoading(false);
     }
@@ -53,33 +55,19 @@ const TaskListScreen = () => {
   };
 
   const getFilteredAndSortedTasks = () => {
-    let filtered = tasks;
+    let filtered = tasks.filter(t => t.status === activeTab);
 
-    // Filter by tab
-    if (activeTab === 'IN PROGRESS') {
-      filtered = tasks.filter(t => t.status === 'ĐANG LÀM' || t.status === 'TRỄ HẠN');
-    } else if (activeTab === 'NEEDS REVISION') {
-      filtered = tasks.filter(t => t.status === 'CẦN SỬA');
-    } else if (activeTab === 'IN REVIEW') {
-      filtered = tasks.filter(t => t.status === 'CHỜ DUYỆT');
-    } else if (activeTab === 'DONE') {
-      filtered = tasks.filter(t => t.status === 'HOÀN THÀNH');
-    }
-
-    // Sort: if DONE or IN REVIEW, sort by newest (descending). 
-    // If IN PROGRESS or NEEDS REVISION, sort by due date ascending (closest deadline first).
     return filtered.sort((a, b) => {
       const dateA = a.date ? new Date(a.date).getTime() : 0;
       const dateB = b.date ? new Date(b.date).getTime() : 0;
 
-      if (activeTab === 'DONE' || activeTab === 'IN REVIEW') {
-        return dateB - dateA; // Newest first
+      if (activeTab === 'HOÀN THÀNH' || activeTab === 'CHỜ DUYỆT') {
+        return dateB - dateA;
       } else {
-        // Handle null dates (put them at the end)
         if (!a.date && !b.date) return 0;
         if (!a.date) return 1;
         if (!b.date) return -1;
-        return dateA - dateB; // Closest deadline first
+        return dateA - dateB;
       }
     });
   };
@@ -108,7 +96,7 @@ const TaskListScreen = () => {
       {renderTabs()}
 
       <View style={styles.listHeader}>
-        <Text style={styles.listHeaderText}>{activeTab} ASSIGNMENTS ({displayTasks.length})</Text>
+        <Text style={styles.listHeaderText}>CÔNG VIỆC ({displayTasks.length})</Text>
         <TouchableOpacity>
           <Ionicons name="filter" size={20} color="#666" />
         </TouchableOpacity>
@@ -120,21 +108,32 @@ const TaskListScreen = () => {
         <FlatList
           data={displayTasks}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => (
+          renderItem={({ item }) => {
+            let formattedDate = 'Không có';
+            if (item.date) {
+              const d = new Date(item.date);
+              if (!isNaN(d.getTime())) {
+                formattedDate = d.toLocaleDateString('vi-VN');
+              } else {
+                formattedDate = item.date;
+              }
+            }
+            return (
             <TaskCard
               task={{
                 id: item.id,
                 title: item.title,
-                status: item.status,
-                due_date: item.date || undefined,
+                mentor: 'Chưa có', // Sẽ được hiển thị trong TaskCard nếu có
+                date: formattedDate,
+                status: item.status as any,
               }}
               onPress={() => handleTaskPress(item.id)}
             />
-          )}
+          )}}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No tasks found for this status.</Text>
+            <Text style={styles.emptyText}>Hiện không có công việc nào.</Text>
           }
         />
       )}
@@ -164,7 +163,7 @@ const styles = StyleSheet.create({
   },
   tab: {
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     borderRadius: 6,
   },
   activeTab: {

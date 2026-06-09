@@ -3,17 +3,48 @@
  * Khi Backend sẵn sàng, thay nội dung các hàm bằng fetch/axios call thật.
  */
 import { TaskDetail, TaskStatus, SubmitReportPayload } from '../types/types';
-import { MOCK_TASK_DETAILS } from '../utils/mockData';
+import apiClient from './apiClient';
 
 /**
  * Lấy chi tiết task theo ID
  */
 export const getTaskDetail = async (taskId: string): Promise<TaskDetail | null> => {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  try {
+    const response = await apiClient.get(`/tasks/${taskId}`) as any;
+    const raw = response.data;
+    if (!raw) return null;
 
-  const task = MOCK_TASK_DETAILS.find((t) => t.id === taskId);
-  return task || null;
+    let mappedStatus: TaskStatus = 'IN_PROGRESS';
+    if (raw.display_status === 'ĐANG LÀM') mappedStatus = 'IN_PROGRESS';
+    else if (raw.display_status === 'CẦN SỬA') mappedStatus = 'NEEDS_REVISION';
+    else if (raw.display_status === 'CHỜ DUYỆT') mappedStatus = 'IN_REVIEW';
+    else if (raw.display_status === 'HOÀN THÀNH') mappedStatus = 'DONE';
+    else if (raw.display_status === 'TRỄ HẠN') mappedStatus = 'OVERDUE';
+
+    return {
+      id: raw.id,
+      title: raw.title,
+      dueDate: raw.due_date ? new Date(raw.due_date).toLocaleDateString('vi-VN') : 'Không có',
+      assignee: raw.interns?.full_name || 'Chưa gán',
+      description: raw.description || 'Không có mô tả',
+      status: mappedStatus,
+      technicalBriefs: (raw.attachments || []).map((a: any) => ({
+        id: a.id,
+        name: a.file_name || 'Tài liệu đính kèm',
+        type: a.type || 'link',
+        url: a.file_url || '#'
+      })),
+      feedback: raw.mentor_feedback ? {
+        content: raw.mentor_feedback,
+        date: raw.updated_at ? new Date(raw.updated_at).toLocaleDateString('vi-VN') : ''
+      } : undefined,
+      submittedReport: raw.submission_summary || undefined,
+      submittedLink: raw.submission_link || undefined
+    };
+  } catch (error) {
+    console.error('Error fetching task detail:', error);
+    return null;
+  }
 };
 
 /**
@@ -22,22 +53,39 @@ export const getTaskDetail = async (taskId: string): Promise<TaskDetail | null> 
 export const submitReport = async (
   payload: SubmitReportPayload
 ): Promise<{ success: boolean; message: string }> => {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  try {
+    const formData = new FormData();
+    if (payload.content) {
+      formData.append('submission_summary', payload.content);
+    }
+    
+    if (payload.attachmentUri && payload.attachmentName) {
+      formData.append('file', {
+        uri: payload.attachmentUri,
+        name: payload.attachmentName,
+        type: payload.attachmentType || 'application/octet-stream',
+      } as any);
+    }
 
-  // Mock: always succeed
-  console.log('[taskService] submitReport:', payload);
-  return {
-    success: true,
-    message: 'Báo cáo đã được nộp thành công!',
-  };
+    const response = await apiClient.upload(`/tasks/${payload.taskId}/submit`, formData) as any;
+    return {
+      success: response.success,
+      message: response.message || 'Báo cáo đã được nộp thành công!',
+    };
+  } catch (error: any) {
+    console.error('Error submitting report:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Có lỗi xảy ra khi nộp báo cáo.',
+    };
+  }
 };
 
 /**
  * Kiểm tra task có cho phép nộp báo cáo không
  * Chỉ IN_PROGRESS và NEEDS_REVISION mới được nộp
  */
-export const canSubmitReport = (status: TaskStatus): boolean => {
+export const canSubmitReport = (status: TaskStatus | string): boolean => {
   return status === 'IN_PROGRESS' || status === 'NEEDS_REVISION';
 };
 

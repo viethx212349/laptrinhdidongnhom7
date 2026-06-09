@@ -265,6 +265,84 @@ const normalizeTaskStatus = (task: any) => {
   }
 };
 
+app.get('/api/tasks/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { data, error } = await supabase.from('tasks').select('*, interns(full_name)').eq('id', id).single();
+    if (error || !data) return res.status(404).json({ success: false, message: 'Task not found' });
+    
+    let attachments: any[] = [];
+    try {
+      const res = await supabase.from('task_attachments').select('*').eq('task_id', id);
+      if (res.data) attachments = res.data;
+    } catch(e) {}
+
+    res.json({
+      success: true,
+      data: {
+        ...data,
+        display_status: normalizeTaskStatus(data),
+        attachments: attachments
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+// Cấu hình thư mục lưu trữ file
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    // Thay thế khoảng trắng và ký tự đặc biệt trong tên file
+    const safeOriginalName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, uniqueSuffix + '-' + safeOriginalName);
+  }
+});
+const upload = multer({ storage });
+
+// Serve static folder cho FE truy cập file
+app.use('/uploads', express.static(uploadDir));
+
+app.post('/api/tasks/:id/submit', upload.single('file'), async (req, res) => {
+  const { id } = req.params;
+  const { submission_summary } = req.body;
+  
+  let submission_link = null;
+  // Nếu có file upload lên, lưu lại đường dẫn tương đối
+  if (req.file) {
+    submission_link = `/uploads/${req.file.filename}`;
+  }
+  
+  try {
+    const { error } = await supabase
+      .from('tasks')
+      .update({
+        status: 'IN_REVIEW',
+        submission_summary: submission_summary || null,
+        submission_link: submission_link || req.body.submission_link || null,
+        submitted_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+      
+    if (error) throw error;
+    res.json({ success: true, message: 'Báo cáo đã được nộp thành công!' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message || 'Server error' });
+  }
+});
 
 import notificationRoutes from './routes/notification.routes';
 

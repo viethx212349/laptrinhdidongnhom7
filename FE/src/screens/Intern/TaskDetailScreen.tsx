@@ -39,7 +39,7 @@ const TaskDetailScreen = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [reportContent, setReportContent] = useState('');
-  const [attachedFile, setAttachedFile] = useState<{ name: string; uri: string } | null>(null);
+  const [attachedFile, setAttachedFile] = useState<{ name: string; uri: string; type?: string } | null>(null);
 
   // Load task detail
   useEffect(() => {
@@ -51,9 +51,16 @@ const TaskDetailScreen = () => {
     try {
       const data = await getTaskDetail(taskId);
       setTask(data);
-      // Pre-fill report content if there's a previous submission and task needs revision
-      if (data?.status === 'NEEDS_REVISION' && data.submittedReport) {
+      // Pre-fill report content and file if there's a previous submission
+      if (data?.submittedReport) {
         setReportContent(data.submittedReport);
+      }
+      if (data?.submittedLink) {
+        // If there's a submitted link from BE, display it as attached file
+        setAttachedFile({
+          name: 'Tệp đã đính kèm (Nhấn để xem)',
+          uri: data.submittedLink,
+        });
       }
     } catch (error) {
       console.error('Failed to load task detail:', error);
@@ -98,6 +105,7 @@ const TaskDetailScreen = () => {
         setAttachedFile({
           name: file.name,
           uri: file.uri,
+          type: file.mimeType || 'application/octet-stream',
         });
       }
     } catch (error) {
@@ -120,14 +128,14 @@ const TaskDetailScreen = () => {
         content: reportContent.trim(),
         attachmentUri: attachedFile?.uri,
         attachmentName: attachedFile?.name,
+        attachmentType: attachedFile?.type,
       });
 
       if (result.success) {
-        Alert.alert('Thành công', result.message, [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
+        Alert.alert('Thành công', result.message || 'Báo cáo đã được nộp thành công!');
+        navigation.goBack();
       } else {
-        Alert.alert('Lỗi', 'Không thể nộp báo cáo. Vui lòng thử lại.');
+        Alert.alert('Lỗi', result.message || 'Không thể nộp báo cáo. Vui lòng thử lại.');
       }
     } catch (error) {
       Alert.alert('Lỗi', 'Đã xảy ra lỗi khi nộp báo cáo.');
@@ -273,7 +281,7 @@ const TaskDetailScreen = () => {
           {/* Text Input */}
           <View style={[styles.inputContainer, !isFormEnabled && styles.inputDisabled]}>
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, !isFormEnabled && { color: '#000' }]}
               placeholder="Summary of changes..."
               placeholderTextColor="#BBBBBB"
               multiline
@@ -301,9 +309,25 @@ const TaskDetailScreen = () => {
                   ADD FILE
                 </Text>
               </TouchableOpacity>
-              <Text style={[styles.fileStatus, !isFormEnabled && styles.textDisabled]}>
-                {attachedFile ? attachedFile.name : 'NO FILE SELECTED'}
-              </Text>
+              {attachedFile ? (
+                <TouchableOpacity onPress={() => {
+                  let urlToOpen = attachedFile.uri;
+                  if (urlToOpen.startsWith('/uploads')) {
+                    // Import BASE_URL at top or just use similar logic
+                    const host = Platform.OS === 'android' ? 'http://10.0.2.2:3001' : 'http://localhost:3001';
+                    urlToOpen = `${host}${urlToOpen}`;
+                  }
+                  Linking.openURL(urlToOpen);
+                }}>
+                  <Text style={[styles.fileStatus, { color: '#1565C0', textDecorationLine: 'underline' }]}>
+                    {attachedFile.name}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={[styles.fileStatus, !isFormEnabled && styles.textDisabled]}>
+                  NO FILE SELECTED
+                </Text>
+              )}
             </View>
           </View>
 

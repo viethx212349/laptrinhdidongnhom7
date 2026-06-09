@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Task, TaskStatus } from '../types/types';
-import { getStatusLabel, getStatusColor } from '../services/taskService';
+import { Task } from '../types/types';
 
 interface TaskCardProps {
   task: Task;
@@ -10,43 +9,54 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, onPress }) => {
-  const statusColor = getStatusColor(task.status);
+  // Determine if we need to show a warning color based on BE status (Vietnamese string)
+  const isOverdue = task.status === 'TRỄ HẠN';
+  const needsRevision = task.status === 'CẦN SỬA';
 
+  const dateColor = isOverdue ? '#D32F2F' : '#555555';
+  
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      {/* Status Badge */}
-      <View style={[styles.statusBadge, { backgroundColor: statusColor.bg }]}>
-        <Text style={[styles.statusText, { color: statusColor.text }]}>
-          {getStatusLabel(task.status)}
-        </Text>
-      </View>
+      {/* Optional Badge for needs revision or overdue */}
+      {(needsRevision || isOverdue) && (
+        <View style={[
+          styles.statusBadge, 
+          { backgroundColor: isOverdue ? '#FFEBEE' : '#FFF3E0' }
+        ]}>
+          <Text style={[
+            styles.statusText, 
+            { color: isOverdue ? '#D32F2F' : '#E65100' }
+          ]}>
+            {task.status}
+          </Text>
+        </View>
+      )}
 
       <Text style={styles.title}>{task.title}</Text>
 
       <View style={styles.infoRow}>
-        <Ionicons name="person" size={12} color="#666" style={styles.icon} />
-        <Text style={styles.infoText}>Mentor: {"HusTrung"}</Text>
+        <Ionicons name="person-outline" size={14} color="#666" style={styles.icon} />
+        <Text style={styles.infoText}>Mentor: {task.mentor}</Text>
       </View>
 
       <View style={styles.infoRow}>
-        <Ionicons name="time" size={12} color="#666" style={styles.icon} />
-        <Text style={styles.infoText}>{task.date}</Text>
+        <Ionicons name="time-outline" size={14} color={dateColor} style={styles.icon} />
+        <Text style={[styles.infoText, { color: dateColor, fontWeight: isOverdue ? '600' : '400' }]}>
+          {task.date}
+        </Text>
       </View>
     </TouchableOpacity>
   );
 };
 
-
-
-// Đây là phần vẽ màu cho TaskCard, bạn có thể tùy chỉnh theo ý muốn để phù hợp với thiết kế của bạn.
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    padding: 20,
+    padding: 24,
     borderRadius: 8,
     marginBottom: 16,
     // Soft shadow for iOS
@@ -70,10 +80,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: '#000000',
     marginBottom: 16,
+    letterSpacing: -0.3,
   },
   infoRow: {
     flexDirection: 'row',
@@ -91,5 +102,4 @@ const styles = StyleSheet.create({
 
 export default TaskCard;
 
-// Re-export Task type for backward compatibility
 export type { Task };

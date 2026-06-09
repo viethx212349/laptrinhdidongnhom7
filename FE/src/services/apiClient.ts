@@ -1,11 +1,12 @@
+import { Platform } from 'react-native';
+
 /**
  * API Client — centralized HTTP client for Backend communication
- * 
- * Khi Backend sẵn sàng, cấu hình BASE_URL và implement các method.
  */
 
-// TODO: Thay bằng URL Backend thật khi deploy
-const BASE_URL = 'http://localhost:3001/api';
+// Sửa lỗi: localhost trên Android Emulator sẽ trỏ vào chính máy ảo chứ không phải máy tính chạy BE.
+// Nếu chạy trên thiết bị thật, vui lòng đổi IP này thành IPv4 của máy tính (VD: http://192.168.1.x:3001/api)
+export const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:3001/api' : 'http://localhost:3001/api';
 
 export interface InternVerifyPayload {
   intern_code: string;
@@ -123,6 +124,9 @@ export const apiClient = {
   upload: async <T>(endpoint: string, formData: FormData): Promise<T> => {
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+      },
       body: formData,
     });
 
